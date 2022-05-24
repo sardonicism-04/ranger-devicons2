@@ -3,9 +3,11 @@
 import fnmatch
 import os
 import stat
+from datetime import datetime
 
 from ranger.api import register_linemode
 from ranger.core.linemode import LinemodeBase
+from ranger.ext.human_readable import human_readable
 
 from .icons import file_node_extensions, file_node_exact_matches, file_node_pattern_matches
 
@@ -65,3 +67,14 @@ class DevIcons2Linemode(LinemodeBase):
             file.relative_path,
             get_symbol(file),
         )
+
+@register_linemode
+class DevIcons2SizeMtimeLinemode(DevIcons2Linemode):
+    name = "sizemtimedevicons2"
+
+    def infostring(self, fobj, metadata):
+        if fobj.stat is None:
+            return '?'
+        return "%s %s" % (human_readable(fobj.size),
+                          datetime.fromtimestamp(fobj.stat.st_mtime).strftime("%Y-%m-%d %H:%M"))
+
